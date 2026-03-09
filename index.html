@@ -1,0 +1,1622 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>现地计划书 v6.5.1</title>
+  <style>
+    :root{
+      --bg:#08111f;
+      --panel: rgba(8,16,28,.72);
+      --panel2: rgba(8,14,24,.58);
+      --line: rgba(121,210,255,.20);
+      --line2: rgba(138,145,255,.34);
+      --txt:#9fe8ff;
+      --mut:#7dd3ff;
+      --mut2:#8c8eff;
+      --accent:#7dd3ff;
+      --accent2:#8c8eff;
+      --ok:#34d399;
+      --bad:#fb7185;
+      --warn:#fbbf24;
+      --shadow:0 22px 70px rgba(0,0,0,.46);
+      --r:18px;
+      --r2:24px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans SC", Arial;
+      color: var(--txt);
+      background:
+        linear-gradient(rgba(9,16,30,.62), rgba(8,14,28,.68)),
+        radial-gradient(900px 520px at 20% 18%, rgba(114, 240, 255, .16), transparent 58%),
+        radial-gradient(860px 500px at 68% 18%, rgba(108, 92, 231, .16), transparent 58%),
+        url("back.png") center center / cover no-repeat fixed;
+      background-color:#08111f;
+    }
+    .wrap{ max-width:1180px; margin:0 auto; padding:18px 18px 70px; }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px;
+      padding:14px 16px;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(8,18,32,.78), rgba(7,14,26,.66));
+      border-radius: var(--r2);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+    .brand{ display:flex; align-items:center; gap:12px; min-width:0; }
+    .avatar{
+      width:40px; height:40px; border-radius:999px; flex:0 0 auto;
+      border:1px solid rgba(233,238,248,.20);
+      box-shadow: 0 12px 26px rgba(0,0,0,.45);
+      object-fit: cover;
+      background: rgba(255,255,255,.04);
+    }
+    .brand .title{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .brand .title b{ font-size:15px; letter-spacing:.2px; }
+    .brand .title span{ font-size:12px; color:var(--mut); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .btn{
+      height:38px; padding:0 14px; border-radius:999px;
+      border:1px solid var(--line2);
+      background: rgba(8,18,32,.56);
+      color: var(--txt);
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.2px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.35);
+      transition: transform .08s ease, border-color .15s ease, background .15s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(124,92,255,.55); }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(101,223,255,.20), rgba(123,125,255,.18));
+      border-color: rgba(124,92,255,.45);
+    }
+    .btn.ghost{ background: rgba(8,18,32,.42); }
+    .btn.danger{ border-color: rgba(239,68,68,.45); }
+    .btn.small{ height:32px; padding:0 12px; font-size:12px; }
+    .badge{
+      font-size:12px; color: rgba(233,238,248,.70);
+      border:1px solid var(--line);
+      padding:6px 10px; border-radius:999px;
+      background: linear-gradient(180deg, rgba(9,18,32,.64), rgba(7,14,24,.54));
+    }
+
+    .panel{
+      margin-top:14px;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(8,18,32,.74), rgba(7,14,26,.60));
+      border-radius: var(--r2);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:12px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(233,238,248,.08);
+    }
+    .panel .hd b{ font-size:13px; letter-spacing:.2px; }
+    .panel .hd span{ font-size:12px; color:var(--mut); }
+    .panel .bd{ padding:14px 16px 16px; }
+
+    .addSplit{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:12px;
+      align-items:stretch;
+    }
+    @media (max-width: 920px){
+      .addSplit{ grid-template-columns: 1fr; }
+    }
+    .card{
+      border:1px solid rgba(120,112,182,.12);
+      background: linear-gradient(180deg, rgba(9,18,32,.64), rgba(7,14,24,.54));
+      border-radius: var(--r2);
+      padding:14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .card .subHd{
+      font-size:12px; color: rgba(43,37,80,.78);
+      margin-bottom:10px;
+      letter-spacing:.2px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .rowWrap{ margin-top:10px; }
+    .rowWrap:first-child{ margin-top:0; }
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;
+    }
+    .field{
+      min-width: 150px;
+      flex: 1 1 0;
+    }
+    .field.w2{ flex: 2 1 0; min-width: 220px; }
+    .label{
+      font-size:11px;
+      color: rgba(43,37,80,.58);
+      margin: 0 0 6px 2px;
+      letter-spacing:.2px;
+    }
+    input, select, textarea{
+      width:100%;
+      border-radius: 999px;
+      border:1px solid rgba(233,238,248,.12);
+      background: rgba(6,12,22,.58);
+      color: var(--txt);
+      height:38px;
+      padding:0 12px;
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    select{ cursor:pointer; background-color: rgba(6,12,22,.72); }
+    textarea{
+      border-radius: 16px;
+      height: 90px;
+      padding:10px 12px;
+      resize: vertical;
+    }
+    input:focus, select:focus, textarea:focus{ border-color: rgba(124,92,255,.55); }
+
+    .miniBtns{ display:flex; gap:8px; align-items:end; }
+    .chips{
+      display:flex; gap:8px; flex-wrap:wrap;
+      padding-top:6px;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid rgba(120,112,182,.14);
+      background: rgba(8,18,32,.48);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color: rgba(43,37,80,.86);
+    }
+    .chip button{
+      all:unset;
+      cursor:pointer;
+      opacity:.75;
+      padding:0 4px;
+    }
+    .chip button:hover{ opacity:1; }
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius:999px;
+      padding:6px 12px;
+      font-size:12px;
+      border:1px solid rgba(120,112,182,.14);
+      background: rgba(8,18,32,.48);
+      color: rgba(43,37,80,.86);
+      white-space:nowrap;
+    }
+    .pill.ok{ border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.12); }
+    .pill.warn{ border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.10); }
+    .pill.bad{ border-color: rgba(239,68,68,.50); background: rgba(239,68,68,.10); }
+
+    .addActionBar{
+      margin-top:12px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+
+    /* Filters */
+    .filters{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+      gap:10px;
+      align-items:end;
+    }
+    @media (max-width: 980px){
+      .filters{ grid-template-columns: 1fr 1fr; }
+    }
+
+    /* List */
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .item{
+      border:1px solid rgba(120,112,182,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,246,255,.80));
+      border-radius: var(--r2);
+      padding:12px 12px;
+      display:grid;
+      grid-template-columns: 220px 1.3fr 260px 210px 110px;
+      gap:10px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .item{ grid-template-columns: 1fr; }
+    }
+    .item .k{
+      font-size:11px; color: rgba(43,37,80,.48);
+      margin-bottom:6px;
+      letter-spacing:.2px;
+    }
+    .item .v{
+      font-size:13px;
+      color: rgba(43,37,80,.92);
+      line-height:1.25;
+      word-break: break-word;
+    }
+    .item .v b{ font-weight:900; }
+    .item .mut{ color: rgba(43,37,80,.58); font-size:12px; }
+    .item .vline{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .item .sum b{ font-size:14px; }
+    .item .rightBtns{ display:flex; justify-content:flex-end; }
+    .toggleLink{ cursor:pointer; color: rgba(124,92,255,.95); font-weight:800; font-size:12px; }
+    .hidden{ display:none; }
+
+    /* Stats */
+    .statsTop{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .kpiRow{ display:flex; gap:10px; flex-wrap:wrap; }
+    .kpi{
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(233,238,248,.12);
+      background: rgba(8,18,32,.56);
+      font-size:12px;
+      color: rgba(233,238,248,.86);
+    }
+    .kpi b{ font-size:12px; }
+    .charts{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 980px){
+      .charts{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px){
+      .charts{ grid-template-columns: 1fr; }
+    }
+    .chartCard{
+      border:1px solid rgba(120,112,182,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,246,255,.80));
+      border-radius: var(--r2);
+      padding:12px 12px;
+      min-height: 240px;
+    }
+    .chartCard .t{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+    .chartCard .t b{ font-size:12px; }
+    .chartCard .t span{ font-size:11px; color: rgba(43,37,80,.48); }
+    .chartWrap{ display:grid; grid-template-columns: 1fr; place-items:center; margin-top:2px; }
+    canvas{ max-width: 100%; }
+
+    /* Error box + toast */
+    #errBox{
+      display:none;
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius: 16px;
+      border:1px solid rgba(239,68,68,.45);
+      background: rgba(239,68,68,.10);
+      color: rgba(255,255,255,.92);
+      font-size:12px;
+      white-space:pre-wrap;
+    }
+    .toastMsg{
+      position:fixed; left:50%; top:18px; transform:translateX(-50%);
+      z-index:9999;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(233,238,248,.18);
+      background: rgba(7,14,24,.88);
+      color: rgba(233,238,248,.9);
+      font-size:12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      display:none;
+    }
+  
+    /* v6.2 light polish */
+    .topbar{ box-shadow: 0 18px 46px rgba(112, 104, 182, .12); }
+    .panel{ box-shadow: 0 18px 46px rgba(112, 104, 182, .12); }
+    .card{ box-shadow: inset 0 1px 0 rgba(255,255,255,.88), 0 12px 30px rgba(112,104,182,.06); }
+    .btn.primary{
+      color:#e8fbff;
+      border-color: rgba(255,111,183,.34);
+    }
+    .btn:hover{ border-color: rgba(255,111,183,.46); }
+    input, select, textarea{
+      color: var(--txt);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.98);
+    }
+    input::placeholder, textarea::placeholder{ color: rgba(43,37,80,.38); }
+    .pill{
+      background: rgba(255,255,255,.82);
+      color: rgba(43,37,80,.84);
+    }
+    .pill.ok{ background: rgba(34,197,94,.10); }
+    .pill.warn{ background: rgba(245,158,11,.10); }
+    .pill.bad{ background: rgba(239,68,68,.10); }
+    .item .v b{ color:#dff7ff; }
+    .toggleLink{ color:#ff5fa7; }
+    .badge{
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,246,255,.88));
+    }
+    .chartCard .t b, .panel .hd b, .brand .title b{ color:#dff7ff; }
+    .avatar{ background: rgba(255,255,255,.9); }
+    
+    /* v6.5.1 back.png theme */
+    .topbar{
+      border-color: rgba(141,226,255,.14);
+      box-shadow: 0 18px 46px rgba(0,0,0,.28);
+      backdrop-filter: blur(18px) saturate(120%);
+    }
+    .panel{
+      border-color: rgba(141,226,255,.12);
+      box-shadow: 0 18px 46px rgba(0,0,0,.26);
+      backdrop-filter: blur(18px) saturate(120%);
+    }
+    .card{
+      border-color: rgba(141,226,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 30px rgba(0,0,0,.18);
+    }
+    .btn.primary{
+      border-color: rgba(101,223,255,.38);
+      box-shadow: 0 10px 26px rgba(0,0,0,.28), 0 0 0 1px rgba(101,223,255,.08) inset;
+    }
+    .btn:hover{ border-color: rgba(101,223,255,.52); }
+    input, select, textarea{
+      border-color: rgba(141,226,255,.14);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    input::placeholder, textarea::placeholder{ color: rgba(220,246,255,.34); }
+    .pill{
+      background: rgba(7,16,28,.44);
+      color: rgba(220,246,255,.88);
+      border-color: rgba(141,226,255,.12);
+    }
+    .badge{
+      background: linear-gradient(180deg, rgba(8,18,32,.80), rgba(7,14,26,.66));
+      color: rgba(220,246,255,.78);
+    }
+    .item .v b, .chartCard .t b, .panel .hd b, .brand .title b{ color:#e8fbff; }
+    .toggleLink{ color:#7de3ff; }
+    .avatar{ background: rgba(8,18,32,.70); }
+    
+/* v6.5.1 stronger neon UI */
+.panel, .card, .chartCard, .item{
+  color:#9fe8ff;
+}
+
+.panel .hd b,
+.chartCard .t b,
+.item .v b,
+.brand .title b{
+  color:#8b8cff;
+}
+
+.statNum, .chartCard .num{
+  color:#7dd3ff;
+}
+
+input, select, textarea{
+  color:#9fe8ff;
+}
+
+label, .label{
+  color:#7dd3ff;
+}
+
+.table, .item{
+  color:#9fe8ff;
+}
+
+.badge{
+  color:#7dd3ff;
+}
+
+/* v6.5.1 ultimate UI */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(700px 300px at 20% 12%, rgba(125,211,255,.08), transparent 60%),
+    radial-gradient(620px 260px at 78% 16%, rgba(140,142,255,.08), transparent 58%),
+    linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0));
+  mix-blend-mode:screen;
+}
+.topbar,
+.panel{
+  position:relative;
+  overflow:hidden;
+}
+.topbar::before,
+.panel::before,
+.card::before,
+.chartCard::before,
+
+.topbar{
+  border-color: rgba(125,211,255,.16);
+  background:
+    linear-gradient(180deg, rgba(8,18,32,.80), rgba(7,14,26,.66));
+  box-shadow:
+    0 24px 56px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 0 0 1px rgba(125,211,255,.04);
+}
+.panel{
+  background:
+    linear-gradient(180deg, rgba(8,18,32,.76), rgba(7,14,26,.62));
+  border-color: rgba(125,211,255,.12);
+  box-shadow:
+    0 22px 52px rgba(0,0,0,.26),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(125,211,255,.03);
+}
+.card,
+.chartCard,
+.item{
+  background:
+    linear-gradient(180deg, rgba(9,18,32,.66), rgba(7,14,24,.58));
+  border-color: rgba(125,211,255,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 14px 30px rgba(0,0,0,.18),
+    0 0 0 1px rgba(125,211,255,.02);
+}
+.panel .hd{
+  border-bottom-color: rgba(125,211,255,.08);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+}
+.panel .hd b,
+.chartCard .t b,
+.brand .title b{
+  color:#a5a2ff;
+  text-shadow: 0 0 18px rgba(140,142,255,.16);
+}
+.panel .hd span,
+.label,
+.brand .title span,
+.chartCard .t span,
+.item .k{
+  color:#7dd3ff;
+}
+.btn{
+  border-color: rgba(125,211,255,.18);
+  background:
+    linear-gradient(180deg, rgba(8,18,32,.68), rgba(7,14,26,.56));
+  color:#dff8ff;
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+.btn.primary{
+  background:
+    linear-gradient(180deg, rgba(125,211,255,.18), rgba(140,142,255,.14));
+  border-color: rgba(125,211,255,.38);
+  color:#f2fdff;
+  text-shadow:0 0 12px rgba(125,211,255,.18);
+}
+.btn:hover{
+  border-color: rgba(125,211,255,.42);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.32),
+    0 0 0 1px rgba(125,211,255,.08) inset,
+    0 0 24px rgba(125,211,255,.10);
+}
+input, select, textarea{
+  border-color: rgba(125,211,255,.14);
+  background:
+    linear-gradient(180deg, rgba(6,12,22,.62), rgba(7,14,24,.54));
+  color:#aef0ff;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.03),
+    0 0 0 1px rgba(125,211,255,.02);
+}
+input:focus, select:focus, textarea:focus{
+  border-color: rgba(125,211,255,.42);
+  box-shadow:
+    0 0 0 3px rgba(125,211,255,.08),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+input::placeholder, textarea::placeholder{
+  color: rgba(174,240,255,.34);
+}
+.pill, .chip, .kpi, .badge{
+  background:
+    linear-gradient(180deg, rgba(7,16,28,.56), rgba(8,18,32,.50));
+  border-color: rgba(125,211,255,.14);
+  color:#bdf3ff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.pill.ok{ border-color: rgba(52,211,153,.34); background: rgba(52,211,153,.10); }
+.pill.warn{ border-color: rgba(251,191,36,.34); background: rgba(251,191,36,.08); }
+.pill.bad{ border-color: rgba(251,113,133,.34); background: rgba(251,113,133,.10); }
+.item{
+  transition: transform .12s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.item:hover{
+  transform: translateY(-1px);
+  border-color: rgba(125,211,255,.18);
+  box-shadow:
+    0 18px 34px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 0 1px rgba(125,211,255,.03);
+}
+.item .v{ color:#d9f8ff; }
+.item .v b{ color:#a8a6ff; text-shadow: 0 0 16px rgba(140,142,255,.12); }
+.toggleLink{
+  color:#86deff;
+  text-shadow: 0 0 12px rgba(125,211,255,.12);
+}
+.chartCard canvas{
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,.18));
+}
+#errBox{
+  border-color: rgba(251,113,133,.38);
+  background: rgba(80,12,24,.34);
+}
+.toastMsg{
+  border-color: rgba(125,211,255,.22);
+  background: rgba(7,14,24,.88);
+}
+.avatar{
+  border-color: rgba(125,211,255,.18);
+  box-shadow: 0 14px 28px rgba(0,0,0,.30), 0 0 0 1px rgba(125,211,255,.05);
+}
+
+/* v6.5.1 table visibility fix */
+.item{
+  background: rgba(8,18,32,.72) !important;
+}
+#listPanel{
+  background: rgba(8,18,32,.72) !important;
+}
+
+
+
+/* v6.5.1 complete visual polish */
+.topbar,
+.panel,
+.card,
+.chartCard,
+.item{
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+.topbar{
+  border-radius: 28px;
+  box-shadow:
+    0 24px 64px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 0 0 1px rgba(125,211,255,.05);
+}
+
+.panel{
+  border-radius: 28px;
+  box-shadow:
+    0 22px 56px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.panel .hd{
+  padding: 14px 18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,0));
+}
+
+.panel .hd b{
+  font-size: 14px;
+  letter-spacing: .3px;
+}
+
+.card{
+  border-radius: 24px;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, rgba(9,18,32,.72), rgba(7,14,24,.60));
+}
+
+.card .subHd{
+  font-size: 12px;
+  margin-bottom: 12px;
+  color: #9fdbff;
+}
+
+.btn{
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+.btn.primary{
+  background:
+    linear-gradient(135deg, rgba(125,211,255,.20), rgba(140,142,255,.18) 54%, rgba(125,211,255,.16));
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.26),
+    0 0 24px rgba(125,211,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+input, select, textarea{
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+.rowWrap{
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(125,211,255,.08);
+  background: linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0));
+}
+
+.rowWrap .label{
+  font-weight: 700;
+  color: #8adfff;
+}
+
+#dateChips,
+#seiyuuChips{
+  padding-top: 10px;
+}
+
+.chip{
+  background:
+    linear-gradient(180deg, rgba(7,16,28,.64), rgba(9,18,32,.56));
+  border-color: rgba(125,211,255,.18);
+  color: #d8f7ff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.14);
+}
+
+.kpi{
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(9,18,32,.72), rgba(7,14,24,.58));
+  border-color: rgba(125,211,255,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.chartCard{
+  min-height: 258px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(8,18,32,.78), rgba(7,14,26,.66));
+  box-shadow:
+    0 16px 34px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.chartCard .t{
+  margin-bottom: 14px;
+}
+
+.chartWrap{
+  padding-top: 6px;
+}
+
+.item{
+  position: relative;
+  border-radius: 24px;
+  padding: 14px 14px;
+  background:
+    linear-gradient(180deg, rgba(8,18,32,.82), rgba(7,14,26,.70)) !important;
+  border: 1px solid rgba(125,211,255,.14);
+  box-shadow:
+    0 18px 38px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  overflow: hidden;
+}
+
+.item::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, rgba(125,211,255,.05), transparent 26%, transparent 74%, rgba(140,142,255,.05));
+  opacity:.9;
+}
+
+.item:hover{
+  transform: translateY(-2px);
+  border-color: rgba(125,211,255,.22);
+  box-shadow:
+    0 22px 42px rgba(0,0,0,.26),
+    0 0 0 1px rgba(125,211,255,.05) inset;
+}
+
+.item .k{
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: .25px;
+  color: #7dd3ff;
+}
+
+.item .v{
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.item .vline{
+  gap: 10px;
+}
+
+.item .sum{
+  border-left: 1px solid rgba(125,211,255,.10);
+  padding-left: 8px;
+}
+
+.item .rightBtns{
+  align-items: flex-start;
+}
+
+.badge{
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.toggleLink{
+  font-weight: 800;
+}
+
+#list{
+  gap: 12px;
+}
+
+#listPanel .bd,
+#statsPanel .bd,
+#filterPanel .bd,
+#addPanel .bd{
+  padding: 16px 18px 18px;
+}
+
+@media (max-width: 980px){
+  .item .sum{
+    border-left: none;
+    padding-left: 0;
+  }
+}
+
+
+/* v6.5.1 flicker fix for main list */
+#listPanel,
+#list,
+.item{
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+#listPanel,
+#listPanel .bd,
+.item{
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.item::after{
+  display:none !important;
+}
+
+.item{
+  will-change: auto;
+  contain: paint;
+}
+
+.item:hover{
+  transform: none !important;
+}
+
+#list{
+  isolation: isolate;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img class="avatar" src="avatar.jpg" alt="avatar" />
+        <div class="title">
+          <b>现地计划书</b>
+          <span>本地保存 · JSON 导入/导出 · 紧凑行程表</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btnExport">导出 JSON</button>
+        <label class="btn ghost" for="fileImport" style="display:inline-flex;align-items:center;gap:8px;">
+          导入 JSON
+        </label>
+        <input id="fileImport" type="file" accept="application/json" style="display:none;">
+        <button class="btn danger" id="btnReset">重置（清空本地）</button>
+        <span class="badge" id="verBadge">v6.5.1</span>
+      </div>
+    </div>
+
+    <div id="errBox"></div>
+
+    <div class="panel" id="addPanel">
+      <div class="hd">
+        <b>添加行程</b>
+        <span>日期多选 + 女声优多选 + 航司/航班号</span>
+      </div>
+      <div class="bd">
+        <div class="addSplit">
+          <div class="card">
+            <div class="subHd">
+              <span>左侧 · 基础信息</span>
+              <span style="color:var(--mut);font-size:12px;">CNY 计价</span>
+            </div>
+
+            <div class="rowWrap">
+              <div class="label">年月日</div>
+              <div class="row">
+                <div class="field"><select id="f_year"></select></div>
+                <div class="field"><select id="f_month"></select></div>
+                <div class="field"><select id="f_day"></select></div>
+                <div class="miniBtns">
+                  <button class="btn small ghost" id="btnAddDate">添加日期</button>
+                  <button class="btn small ghost" id="btnClearDates">清空</button>
+                </div>
+              </div>
+              <div class="chips" id="dateChips"></div>
+            </div>
+
+            <div class="rowWrap">
+              <div class="label">时分</div>
+              <div class="row">
+                <div class="field"><select id="f_hour"></select></div>
+                <div class="field"><select id="f_min"></select></div>
+              </div>
+            </div>
+
+            <div class="rowWrap">
+              <div class="row">
+                <div class="field">
+                  <div class="label">航司</div>
+                  <input id="f_airline" placeholder="ANA / JAL ..." />
+                </div>
+                <div class="field">
+                  <div class="label">航班号</div>
+                  <input id="f_flightNo" placeholder="NH123 / JL201 ..." />
+                </div>
+                <div class="field">
+                  <div class="label">交通价（CNY）</div>
+                  <input id="f_transportPrice" inputmode="numeric" value="0" />
+                </div>
+              </div>
+            </div>
+
+            <div class="rowWrap">
+              <div class="row">
+                <div class="field">
+                  <div class="label">国家/地区</div>
+                  <select id="f_country">
+<option value="">请选择</option>
+<option value="日本">日本</option>
+<option value="中国">中国</option>
+<option value="香港">香港</option>
+<option value="台湾">台湾</option>
+<option value="韩国">韩国</option>
+<option value="新加坡">新加坡</option>
+<option value="美国">美国</option>
+</select>
+                </div>
+                <div class="field">
+                  <div class="label">城市</div>
+                  <input id="f_city" placeholder="东京 / 大阪 ..." />
+                </div>
+                <div class="field w2">
+                  <div class="label">场馆</div>
+                  <input id="f_venue" placeholder="武道馆 / Zepp ..." />
+                </div>
+                <div class="field">
+                  <div class="label">住宿价（CNY）</div>
+                  <input id="f_lodgingPrice" inputmode="numeric" value="0" />
+                </div>
+              </div>
+            </div>
+
+            <div class="rowWrap">
+              <div class="row">
+                <div class="field">
+                  <div class="label">票务状态</div>
+                  <select id="f_ticketStatus"></select>
+                </div>
+                <div class="field">
+                  <div class="label">门票价（CNY）</div>
+                  <input id="f_ticketPrice" inputmode="numeric" value="0" />
+                </div>
+                <div class="field">
+                  <div class="label">座位</div>
+                  <input id="f_seat" placeholder="1F 10列..." />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="subHd">
+              <span>右侧 · Live & 备注</span>
+              <span style="font-size:12px;color:var(--mut);">v6.5.1</span>
+            </div>
+
+            <div class="rowWrap">
+              <div class="label">Live 名称</div>
+              <input id="f_live" placeholder="Ave Mujica 6th LIVE ..." />
+            </div>
+
+            <div class="rowWrap">
+              <div class="row">
+                <div class="field">
+                  <div class="label">票务状态（同主表）</div>
+                  <select id="f_ticketStatus2"></select>
+                </div>
+                <div class="field">
+                  <div class="label">票种</div>
+                  <select id="f_ticketType"></select>
+                </div>
+              </div>
+            </div>
+
+            <div class="rowWrap">
+              <div class="label">女声优（可多选）</div>
+              <div class="row">
+                <div class="field">
+                  <div class="label">企划</div>
+                  <select id="seiyuuProject"></select>
+                </div>
+                <div class="field">
+                  <div class="label">女声优</div>
+                  <select id="seiyuuMember"></select>
+                </div>
+                <div style="display:flex;align-items:end;">
+                  <button class="btn small ghost" id="btnFillSeiyuu">填入</button>
+                </div>
+              </div>
+              <div class="row" style="margin-top:8px;">
+                <div class="field w2">
+                  <div class="label">手动输入（逗号分隔，也支持复制名单）</div>
+                  <input id="seiyuuInput" placeholder="羊宮妃那, 佐々木李子 ..." />
+                </div>
+                <div style="display:flex;align-items:end;">
+                  <button class="btn small ghost" id="btnAddSeiyuu">添加</button>
+                </div>
+              </div>
+              <div class="chips" id="seiyuuChips"></div>
+            </div>
+
+            <div class="rowWrap">
+              <div class="label">备注</div>
+              <textarea id="notes" placeholder="住宿信息 / 交通备注 / 其他"></textarea>
+            </div>
+
+            <div class="addActionBar">
+              <button class="btn primary" id="btnAdd">添加到行程</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="filterPanel">
+      <div class="hd">
+        <b>筛选与排序</b>
+        <span>默认：时间越靠后越靠上</span>
+      </div>
+      <div class="bd">
+        <div class="filters">
+          <div>
+            <div class="label">关键词（Live/场馆/备注/城市）</div>
+            <input id="q" placeholder="搜索..." />
+          </div>
+          <div>
+            <div class="label">国家</div>
+            <select id="f_countryFilter"></select>
+          </div>
+          <div>
+            <div class="label">城市</div>
+            <select id="f_cityFilter"></select>
+          </div>
+          <div>
+            <div class="label">票务状态</div>
+            <select id="f_statusFilter"></select>
+          </div>
+          <div>
+            <div class="label">航司（筛选）</div>
+            <select id="f_airlineFilter"></select>
+          </div>
+        </div>
+        <div class="statsTop" style="margin-top:12px;">
+          <div class="kpiRow">
+            <div class="kpi">条目 <b id="k_count">0</b></div>
+            <div class="kpi">总开销 <b id="k_total">0</b> CNY</div>
+            <div class="kpi">门票 <b id="k_ticket">0</b> CNY</div>
+            <div class="kpi">交通 <b id="k_transport">0</b> CNY</div>
+            <div class="kpi">住宿 <b id="k_lodging">0</b> CNY</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn small ghost" id="btnClearFilters">重置筛选</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="statsPanel">
+      <div class="hd">
+        <b>统计区</b>
+        <span>基于当前筛选结果 · 自动更新</span>
+      </div>
+      <div class="bd">
+        <div class="charts">
+          <div class="chartCard">
+            <div class="t"><b>国家分布</b><span>Top 6 + 其他</span></div>
+            <div class="chartWrap"><canvas id="pie_country" width="260" height="180"></canvas></div>
+          </div>
+          <div class="chartCard">
+            <div class="t"><b>城市分布</b><span>Top 6 + 其他</span></div>
+            <div class="chartWrap"><canvas id="pie_city" width="260" height="180"></canvas></div>
+          </div>
+          <div class="chartCard">
+            <div class="t"><b>航司分布</b><span>Top 6 + 其他</span></div>
+            <div class="chartWrap"><canvas id="pie_airline" width="260" height="180"></canvas></div>
+          </div>
+          <div class="chartCard">
+            <div class="t"><b>女声优次数</b><span>Top 6 + 其他</span></div>
+            <div class="chartWrap"><canvas id="pie_seiyuu" width="260" height="180"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="listPanel">
+      <div class="hd">
+        <b>行程主表</b>
+        <span>紧凑布局 · 点击“女声优”可展开</span>
+      </div>
+      <div class="bd">
+        <div class="list" id="list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    "use strict";
+    const APP_VERSION = "v6.5.1";
+    const LS_KEY = "genchi_plan_v6";
+    const $ = (id)=>document.getElementById(id);
+    const errBox = $("errBox");
+
+    function showErr(msg){
+      errBox.style.display = "block";
+      errBox.textContent = "JS 错误：\n" + String(msg||"");
+    }
+    function clearErr(){
+      errBox.style.display = "none";
+      errBox.textContent = "";
+    }
+    function toast(msg){
+      let t = $("toastMsg");
+      if(!t){
+        t = document.createElement("div");
+        t.id="toastMsg";
+        t.className="toastMsg";
+        document.body.appendChild(t);
+      }
+      t.textContent = String(msg||"");
+      t.style.display="block";
+      clearTimeout(t._tm);
+      t._tm = setTimeout(()=>{ t.style.display="none"; }, 2200);
+    }
+    function safeRun(fn, label){
+      try{ clearErr(); return fn(); }
+      catch(e){
+        console.error(label||"Error", e);
+        showErr((label?label+": ":"") + (e && e.message ? e.message : String(e)));
+        toast("❌ " + (label || "错误"));
+        return null;
+      }
+    }
+
+    function esc(s){
+      return String(s??"").replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    }
+    function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+    function asInt(v){
+      const n = parseFloat(String(v??"").replace(/[^0-9.\-]/g,""));
+      return Number.isFinite(n) ? n : 0;
+    }
+    function normStr(s){ return String(s??"").trim(); }
+
+    const TICKET_STATUSES = ["未设置","抽选中","已买","已入金","已出票","已取票","已观演"];
+    const TICKET_TYPES = ["(空)","S席","A席","一般席","见切席","全席指定"];
+    const SEIYUU_MAP = {
+      "Poppin'Party": ["愛美","大塚紗英","西本りみ","大橋彩香","伊藤彩沙"],
+      "Afterglow": ["佐倉綾音","三澤紗千香","加藤英美里","日笠陽子","金元寿子"],
+      "Pastel＊Palettes": ["前島亜美","小澤亜李","上坂すみれ","中上育実","秦佐和子"],
+      "Roselia": ["相羽あいな","工藤晴香","中島由貴","櫻川めぐ","志崎樺音"],
+      "ハロー、ハッピーワールド！": ["伊藤美来","田所あずさ","吉田有里","豊田萌絵","黒沢ともよ"],
+      "Morfonica": ["進藤あまね","直田姫奈","西尾夕香","mika","Ayasa"],
+      "RAISE A SUILEN": ["Raychell","小原莉子","夏芽","倉知玲鳳","紡木吏佐"],
+      "MyGO!!!!!": ["羊宮妃那","立石凛","青木陽菜","小日向美香","林鼓子"],
+      "Ave Mujica": ["佐々木李子","渡瀬結月","岡田夢以","米澤茜","高尾奏音"],
+      "夢限大みゅーたいぷ": ["仲町あられ","宮永ののか","峰月律","藤都子","千石ユノ"]
+    };
+
+    const state = { items: [], addDates: [], addSeiyuu: [] };
+
+    function fillRange(sel, start, end, pad2=false){
+      sel.innerHTML="";
+      for(let i=start;i<=end;i++){
+        const o=document.createElement("option");
+        o.value = String(i);
+        o.textContent = pad2 ? String(i).padStart(2,"0") : String(i);
+        sel.appendChild(o);
+      }
+    }
+    function initSelects(){
+      fillRange($("f_year"), 2000, 2050, false);
+      fillRange($("f_month"), 1, 12, false);
+      fillRange($("f_day"), 1, 31, false);
+      fillRange($("f_hour"), 0, 23, true);
+      fillRange($("f_min"), 0, 59, true);
+
+      const d=new Date();
+      $("f_year").value = String(d.getFullYear());
+      $("f_month").value = String(d.getMonth()+1);
+      $("f_day").value = String(d.getDate());
+      $("f_hour").value = String(d.getHours()).padStart(2,"0");
+      $("f_min").value = "00";
+
+      $("f_ticketStatus").innerHTML = TICKET_STATUSES.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+      $("f_ticketStatus2").innerHTML = $("f_ticketStatus").innerHTML;
+      $("f_ticketStatus2").value = "未设置";
+      $("f_ticketStatus").value = "未设置";
+      $("f_ticketType").innerHTML = TICKET_TYPES.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+      $("f_ticketType").value = "(空)";
+
+      $("f_ticketStatus").addEventListener("change", ()=> $("f_ticketStatus2").value = $("f_ticketStatus").value);
+      $("f_ticketStatus2").addEventListener("change", ()=> $("f_ticketStatus").value = $("f_ticketStatus2").value);
+
+      const projects = Object.keys(SEIYUU_MAP);
+      $("seiyuuProject").innerHTML = `<option value="">(请选择企划)</option>` + projects.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");
+      $("seiyuuMember").innerHTML = `<option value="">(请选择)</option>`;
+      $("seiyuuProject").addEventListener("change", ()=>{
+        const p = $("seiyuuProject").value;
+        const arr = p ? SEIYUU_MAP[p] : [];
+        $("seiyuuMember").innerHTML = `<option value="">(请选择)</option>` + arr.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join("");
+      });
+    }
+
+    function getAddDateDot(){
+      const y = parseInt($("f_year").value,10);
+      const m = parseInt($("f_month").value,10);
+      const d = parseInt($("f_day").value,10);
+      if(!Number.isFinite(y)||!Number.isFinite(m)||!Number.isFinite(d)) return "";
+      return `${y}.${m}.${d}`;
+    }
+    function getAddTimeStr(){ return `${$("f_hour").value}:${$("f_min").value}`; }
+
+    function renderDateChips(){
+      const box = $("dateChips");
+      box.innerHTML="";
+      state.addDates.forEach((dot, idx)=>{
+        const chip=document.createElement("div");
+        chip.className="chip";
+        chip.innerHTML = `${esc(dot)} <button title="移除">×</button>`;
+        chip.querySelector("button").addEventListener("click", ()=>{
+          state.addDates.splice(idx,1);
+          renderDateChips();
+        });
+        box.appendChild(chip);
+      });
+    }
+    function addDateChip(){
+      const dot = getAddDateDot();
+      if(!dot) return;
+      if(!state.addDates.includes(dot)) state.addDates.push(dot);
+      renderDateChips();
+      toast("✅ 已添加日期");
+    }
+    function clearDates(){ state.addDates = []; renderDateChips(); }
+
+    function parseNames(raw){
+      const s = String(raw||"").trim();
+      if(!s) return [];
+      return s.split(/[,，\n\/]+/g).map(x=>x.trim()).filter(Boolean);
+    }
+    function renderSeiyuuChips(){
+      const box=$("seiyuuChips");
+      box.innerHTML="";
+      state.addSeiyuu.forEach((name, idx)=>{
+        const chip=document.createElement("div");
+        chip.className="chip";
+        chip.innerHTML = `${esc(name)} <button title="移除">×</button>`;
+        chip.querySelector("button").addEventListener("click", ()=>{
+          state.addSeiyuu.splice(idx,1);
+          renderSeiyuuChips();
+        });
+        box.appendChild(chip);
+      });
+    }
+    function addSeiyuuNames(names){
+      const set = new Set(state.addSeiyuu);
+      names.forEach(n=> set.add(n));
+      state.addSeiyuu = [...set];
+      renderSeiyuuChips();
+    }
+
+    function parseDateISO(dot){
+      const m = String(dot||"").match(/^(\d{4})\.(\d{1,2})\.(\d{1,2})$/);
+      if(!m) return "9999-99-99";
+      const y=m[1], mo=String(m[2]).padStart(2,"0"), d=String(m[3]).padStart(2,"0");
+      return `${y}-${mo}-${d}`;
+    }
+    function sortKey(it){ return parseDateISO(it.date) + "T" + (it.time||"00:00"); }
+    function sumCost(it){ return asInt(it.ticketPrice) + asInt(it.transportPrice) + asInt(it.lodgingPrice); }
+
+    function normalizeItem(x){
+      return {
+        id: x.id || uid(),
+        date: normStr(x.date),
+        time: normStr(x.time || "00:00"),
+        country: normStr(x.country),
+        city: normStr(x.city),
+        venue: normStr(x.venue),
+        airline: normStr(x.airline),
+        flightNo: normStr(x.flightNo),
+        ticketStatus: normStr(x.ticketStatus || "未设置"),
+        ticketType: normStr(x.ticketType || "(空)"),
+        seat: normStr(x.seat),
+        live: normStr(x.live),
+        notes: normStr(x.notes),
+        seiyuuTags: normStr(x.seiyuuTags || ""),
+        ticketPrice: asInt(x.ticketPrice),
+        transportPrice: asInt(x.transportPrice),
+        lodgingPrice: asInt(x.lodgingPrice)
+      };
+    }
+
+    function addFromForm(){
+      const dates = (state.addDates.length ? state.addDates.slice() : [getAddDateDot()]).filter(Boolean);
+      if(dates.length===0){ toast("❌ 日期未完整选择"); return; }
+      const time = getAddTimeStr();
+
+      const itBase = normalizeItem({
+        date: "",
+        time,
+        country: $("f_country").value,
+        city: $("f_city").value,
+        venue: $("f_venue").value,
+        airline: $("f_airline").value,
+        flightNo: $("f_flightNo").value,
+        ticketStatus: $("f_ticketStatus").value,
+        ticketType: $("f_ticketType").value,
+        seat: $("f_seat").value,
+        live: $("f_live").value,
+        notes: $("notes").value,
+        seiyuuTags: state.addSeiyuu.join(","),
+        ticketPrice: $("f_ticketPrice").value,
+        transportPrice: $("f_transportPrice").value,
+        lodgingPrice: $("f_lodgingPrice").value
+      });
+
+      let added = 0;
+      dates.forEach(dot=>{
+        state.items.push({...itBase, id: uid(), date: dot});
+        added++;
+      });
+
+      save();
+      renderAll();
+      toast(`✅ 已添加 ${added} 条`);
+    }
+
+    function save(){ localStorage.setItem(LS_KEY, JSON.stringify({v:APP_VERSION, items: state.items})); }
+    function load(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return;
+        const data = JSON.parse(raw);
+        const items = Array.isArray(data.items) ? data.items : [];
+        state.items = items.map(normalizeItem);
+      }catch(e){ console.warn("load failed", e); }
+    }
+
+    function uniqueSorted(arr){
+      return [...new Set(arr.map(x=>normStr(x)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    }
+    function fillFilterSelect(sel, values){
+      const cur = sel.value;
+      sel.innerHTML = `<option value="">全部</option>` + values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+      if(values.includes(cur)) sel.value = cur;
+    }
+
+    function getFiltered(){
+      const q = normStr($("q").value).toLowerCase();
+      const fc = $("f_countryFilter").value;
+      const fci = $("f_cityFilter").value;
+      const fs = $("f_statusFilter").value;
+      const fa = $("f_airlineFilter").value;
+
+      return state.items.filter(it=>{
+        if(fc && it.country!==fc) return false;
+        if(fci && it.city!==fci) return false;
+        if(fs && it.ticketStatus!==fs) return false;
+        if(fa && it.airline!==fa) return false;
+        if(q){
+          const blob = (it.live+" "+it.venue+" "+it.notes+" "+it.city+" "+it.country).toLowerCase();
+          if(!blob.includes(q)) return false;
+        }
+        return true;
+      }).sort((a,b)=> sortKey(b).localeCompare(sortKey(a)));
+    }
+
+    function statusClass(s){
+      if(["已观演","已出票","已取票","已买","已入金"].includes(s)) return "ok";
+      if(s==="抽选中") return "warn";
+      return "";
+    }
+
+    function renderList(items){
+      const box=$("list");
+      box.innerHTML="";
+      items.forEach(it=>{
+        const el=document.createElement("div");
+        el.className="item";
+        const seiyuuArr = parseNames(it.seiyuuTags);
+        const seiyuuShort = seiyuuArr.length ? `${seiyuuArr.length}人` : "无";
+        const sum = sumCost(it);
+
+        el.innerHTML = `
+          <div>
+            <div class="k">日期 / 时间</div>
+            <div class="vline">
+              <span class="pill"><b>${esc(it.date)}</b></span>
+              <span class="pill"><b>${esc(it.time||"--:--")}</b></span>
+            </div>
+            <div class="k" style="margin-top:10px;">国家/城市</div>
+            <div class="v">${esc(it.country||"-")} / ${esc(it.city||"-")}</div>
+            <div class="k" style="margin-top:10px;">票务</div>
+            <div class="vline">
+              <span class="pill ${statusClass(it.ticketStatus)}">${esc(it.ticketStatus||"未设置")}</span>
+              <span class="mut">${esc(it.ticketType||"")}</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="k">Live 名称</div>
+            <div class="v"><b>${esc(it.live||"")}</b>${it.live? "" : ` <span class="mut">(未填写)</span>`}</div>
+            <div class="k" style="margin-top:10px;">场馆</div>
+            <div class="v">${esc(it.venue||"-")}</div>
+            <div class="k" style="margin-top:10px;">备注</div>
+            <div class="v mut">${esc(it.notes||"-")}</div>
+          </div>
+
+          <div>
+            <div class="k">航司 / 航班号</div>
+            <div class="v">${esc(it.airline||"-")} / ${esc(it.flightNo||"-")}</div>
+            <div class="k" style="margin-top:10px;">座位</div>
+            <div class="v">${esc(it.seat||"-")}</div>
+            <div class="k" style="margin-top:10px;">女声优</div>
+            <div class="vline">
+              <span class="pill">${esc(seiyuuShort)}</span>
+              <span class="toggleLink" data-role="toggleSeiyuu">查看</span>
+            </div>
+            <div class="hidden" data-role="seiyuuBox" style="margin-top:8px;">
+              <div class="chips">
+                ${seiyuuArr.length? seiyuuArr.map(n=>`<span class="pill">${esc(n)}</span>`).join("") : `<span class="mut">无</span>`}
+              </div>
+            </div>
+          </div>
+
+          <div class="sum">
+            <div class="k">价格（CNY）</div>
+            <div class="vline"><span class="mut">门票</span> <b>${esc(it.ticketPrice)}</b></div>
+            <div class="vline"><span class="mut">交通</span> <b>${esc(it.transportPrice)}</b></div>
+            <div class="vline"><span class="mut">住宿</span> <b>${esc(it.lodgingPrice)}</b></div>
+            <div class="vline" style="margin-top:8px;"><span class="mut">合计</span> <b>${esc(sum)}</b></div>
+          </div>
+
+          <div class="rightBtns">
+            <button class="btn small danger" data-role="del">删除</button>
+          </div>
+        `;
+
+        el.querySelector('[data-role="del"]').addEventListener("click", ()=>{
+          state.items = state.items.filter(x=>x.id!==it.id);
+          save();
+          renderAll();
+        });
+        el.querySelector('[data-role="toggleSeiyuu"]').addEventListener("click", ()=>{
+          el.querySelector('[data-role="seiyuuBox"]').classList.toggle("hidden");
+        });
+
+        box.appendChild(el);
+      });
+    }
+
+    function kpi(items){
+      const tTicket = items.reduce((a,x)=>a+asInt(x.ticketPrice),0);
+      const tTransport = items.reduce((a,x)=>a+asInt(x.transportPrice),0);
+      const tLodging = items.reduce((a,x)=>a+asInt(x.lodgingPrice),0);
+      $("k_count").textContent = String(items.length);
+      $("k_ticket").textContent = String(tTicket);
+      $("k_transport").textContent = String(tTransport);
+      $("k_lodging").textContent = String(tLodging);
+      $("k_total").textContent = String(tTicket+tTransport+tLodging);
+    }
+
+    function topNCount(values, n=6){
+      const m = new Map();
+      values.forEach(v=>{
+        const k = normStr(v) || "无数据";
+        m.set(k, (m.get(k)||0)+1);
+      });
+      const arr = [...m.entries()].sort((a,b)=>b[1]-a[1]);
+      const top = arr.slice(0,n);
+      const rest = arr.slice(n).reduce((s, x)=>s+x[1], 0);
+      if(rest>0) top.push(["其他", rest]);
+      return top;
+    }
+
+    function drawDonut(canvas, pairs){
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0,0,w,h);
+
+      const total = pairs.reduce((a,x)=>a+x[1],0) || 1;
+      const cx = w/2, cy = h/2+6;
+      const r = Math.min(w,h)*0.38;
+      const ir = r*0.62;
+
+      const color = (i)=> `hsla(${(265 + i*47)%360}, 85%, 62%, .88)`;
+      let a0 = -Math.PI/2;
+      pairs.forEach((p, i)=>{
+        const frac = p[1]/total;
+        const a1 = a0 + frac*Math.PI*2;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.arc(cx,cy,r,a0,a1);
+        ctx.closePath();
+        ctx.fillStyle = color(i);
+        ctx.fill();
+        a0 = a1;
+      });
+
+      ctx.beginPath();
+      ctx.arc(cx,cy,ir,0,Math.PI*2);
+      ctx.fillStyle = "rgba(0,0,0,.58)";
+      ctx.fill();
+
+      const top = pairs[0] ? pairs[0][0] : "无数据";
+      const topv = pairs[0] ? pairs[0][1] : 0;
+      ctx.fillStyle = "rgba(233,238,248,.92)";
+      ctx.font = "700 14px ui-sans-serif,system-ui";
+      ctx.textAlign = "center";
+      ctx.fillText(String(top), cx, cy-2);
+      ctx.fillStyle = "rgba(233,238,248,.62)";
+      ctx.font = "600 12px ui-sans-serif,system-ui";
+      ctx.fillText(`${topv}次`, cx, cy+16);
+
+      const legendY = h-10;
+      ctx.textAlign = "left";
+      ctx.font = "600 11px ui-sans-serif,system-ui";
+      let x = 10, y = legendY-10;
+      pairs.slice(0,4).forEach((p,i)=>{
+        ctx.fillStyle = color(i);
+        ctx.fillRect(x, y-8, 10, 10);
+        ctx.fillStyle = "rgba(233,238,248,.72)";
+        ctx.fillText(`${p[0]} ${p[1]}`, x+14, y);
+        y -= 16;
+      });
+    }
+
+    function renderStats(items){
+      drawDonut($("pie_country"), topNCount(items.map(x=>x.country)));
+      drawDonut($("pie_city"), topNCount(items.map(x=>x.city)));
+      drawDonut($("pie_airline"), topNCount(items.map(x=>x.airline)));
+      drawDonut($("pie_seiyuu"), topNCount(items.flatMap(x=>parseNames(x.seiyuuTags))));
+    }
+
+    function renderFilters(){
+      fillFilterSelect($("f_countryFilter"), uniqueSorted(state.items.map(x=>x.country)));
+      fillFilterSelect($("f_cityFilter"), uniqueSorted(state.items.map(x=>x.city)));
+      fillFilterSelect($("f_airlineFilter"), uniqueSorted(state.items.map(x=>x.airline)));
+      $("f_statusFilter").innerHTML = `<option value="">全部</option>` + TICKET_STATUSES.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+    }
+
+    function renderAll(){
+      const items = getFiltered();
+      renderFilters();
+      renderList(items);
+      kpi(items);
+      renderStats(items);
+    }
+
+    function exportJSON(){
+      const data = { v: APP_VERSION, exportedAt: new Date().toISOString(), items: state.items };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url; a.download = `genchi_plan_${APP_VERSION}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 500);
+    }
+
+    function importJSON(file){
+      const reader = new FileReader();
+      reader.onload = ()=> safeRun(()=>{
+        const data = JSON.parse(String(reader.result||"{}"));
+        const items = Array.isArray(data.items) ? data.items : [];
+        state.items = items.map(normalizeItem);
+        save(); renderAll(); toast("✅ 已导入");
+      }, "导入 JSON");
+      reader.readAsText(file);
+    }
+
+    function resetAll(){
+      if(!confirm("确定清空本地数据？")) return;
+      localStorage.removeItem(LS_KEY);
+      state.items = []; state.addDates = []; state.addSeiyuu = [];
+      renderDateChips(); renderSeiyuuChips(); renderAll(); toast("已清空");
+    }
+
+    function wire(){
+      $("btnAddDate").addEventListener("click", ()=>safeRun(addDateChip, "添加日期"));
+      $("btnClearDates").addEventListener("click", ()=>safeRun(clearDates, "清空日期"));
+      $("btnAdd").addEventListener("click", ()=>safeRun(addFromForm, "添加行程"));
+
+      $("btnFillSeiyuu").addEventListener("click", ()=>safeRun(()=>{
+        const n = $("seiyuuMember").value;
+        if(!n) return;
+        $("seiyuuInput").value = n;
+        toast("已填入");
+      }, "填入女声优"));
+
+      $("btnAddSeiyuu").addEventListener("click", ()=>safeRun(()=>{
+        const picked = $("seiyuuMember").value ? [$("seiyuuMember").value] : [];
+        const manual = parseNames($("seiyuuInput").value);
+        addSeiyuuNames([...picked, ...manual]);
+        $("seiyuuInput").value = "";
+        toast("✅ 已添加女声优");
+      }, "添加女声优"));
+
+      $("btnExport").addEventListener("click", ()=>safeRun(exportJSON, "导出 JSON"));
+      $("fileImport").addEventListener("change", (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if(f) importJSON(f);
+        e.target.value = "";
+      });
+      $("btnReset").addEventListener("click", ()=>safeRun(resetAll, "重置"));
+
+      ["q","f_countryFilter","f_cityFilter","f_statusFilter","f_airlineFilter"].forEach(id=>{
+        $(id).addEventListener("input", ()=>renderAll());
+        $(id).addEventListener("change", ()=>renderAll());
+      });
+      $("btnClearFilters").addEventListener("click", ()=>{
+        $("q").value="";
+        $("f_countryFilter").value="";
+        $("f_cityFilter").value="";
+        $("f_statusFilter").value="";
+        $("f_airlineFilter").value="";
+        renderAll();
+      });
+    }
+
+    window.addEventListener("error", (e)=>{ showErr(e.message || e.error || "未知错误"); });
+    window.addEventListener("unhandledrejection", (e)=>{ showErr("Promise 错误: " + (e.reason?.message || e.reason || "未知")); });
+
+    initSelects();
+    load();
+    renderDateChips();
+    renderSeiyuuChips();
+    wire();
+    renderAll();
+  </script>
+</body>
+</html>
